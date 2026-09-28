@@ -1,0 +1,41 @@
+{% extends 'meals/base.html' %}
+{% block title %}Каталог продуктов | NutriPlanner{% endblock %}
+{% block content %}
+
+<h2>Каталог продуктов (КБЖУ указаны на 100 грамм)</h2>
+
+<div>
+    <form action="{% url 'product_list' %}" method="get">
+        <input type="text" name="q" value="{{ query }}">
+        <button type="submit">Найти</button>
+    </form>
+</div>
+{% if query %}
+    <a href="{% url 'product_list' %}">Сбросить</a>
+{% endif %}
+{% if query %}
+    <p>Результаты поиска по запросу: <b>"{{ query }}"</b>
+    (найдено: {{ products|length }} продукт(ов))</p>
+{% endif %}
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for product in products %}
+    <div class="col">    
+    <div class="card-body">
+            <h5>{{ product.name }}</h5>
+            <ul>
+                <li>Калории: {{product.calories}}</li>
+                <li>Белки: {{product.proteins}}</li>
+                <li>Жиры: {{product.fats}}</li>
+                <li>Углеводы: {{product.carbs}}</li>
+            </ul>
+            <form action="{% url 'add_to_plan' product.id %}" method="post">
+                {% csrf_token %}
+                <input type="number" name="weight" value="100" min="1" step="1">
+                <button type="submit">Добавить в рацион</button>
+            </form>
+    </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'meals/base.html' %}
+{% block title %}Мой дневной рацион | NutriPlanner{% endblock %}
+{% block content %}
+    <h2>Мой дневной рацион</h2>
+
+    <div >
+        <h4>Итоговые показатели за день</h4>
+        <div class="row text-center border rounded" >
+            <div class="col-md-3">
+                <div>Калории</div>
+                <span>{{ totals.calories }} ккал</span>
+            </div>
+            <div class="col-md-3">
+                <div>Жиры</div>
+                <span>{{ totals.proteins }} г</span>
+            </div>
+            <div class="col-md-3">
+                <div>Жиры</div>
+                <span>{{ totals.fats }} г</span>
+            </div>
+            <div class="col-md-3">
+                <div>Углеводы</div>
+                <span>{{ totals.carbs }} г</span>
+            </div>
+        </div>
+    </div>
+
+    {% if items %}
+        <form action="{% url 'clear_plan' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Вы действительно хотите очистить весь рацион?')">
+                Очистить весь рацион
+            </button>
+        </form>
+    {% endif %}
+    {% if items %}
+    <div class="table-responsive">
+        <table class="table table-hover aligh-middle bg-white">
+            <thead class="table-success">
+                <tr>
+                    <th>Продукт</th>
+                    <th>Вес (г)</th>
+                    <th>Добавить</th>
+                    <th>Калории (г)</th>
+                    <th>Белки (г)</th>
+                    <th>Жиры (г)</th>
+                    <th>Углеводы (г)</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody class="table-success">
+                {% for item in items %}
+                <tr>
+                    <td>{{item.product.name}}</td>
+                    <td>{{ item.weight }}</td>
+                    <td>
+                        <form action="{% url 'add_to_plan' item.product.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="number" name="weight" value="{{ item.weight }}" min="1" step="1">
+                            <button type="submit">➕</button>
+                        </form>
+                    </td>
+                    <td>{{ item.calories }}</td>
+                    <td>{{ item.proteins }}</td>
+                    <td>{{ item.fats }}</td>
+                    <td>{{ item.carbs }}</td>
+                    <td>
+                    <form action="{% url 'remove_from_plan' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">❌</button>
+                    </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Ваш рацион пуст
+    </div>
+    {% endif %}
+
+
+{% endblock %}
